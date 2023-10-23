@@ -7,8 +7,8 @@ from typing import Any
 from click import UsageError
 
 CONFIG_FOLDER = os.path.expanduser("~/.config")
-SHELL_GPT_CONFIG_FOLDER = Path(CONFIG_FOLDER) / "shell_gpt"
-SHELL_GPT_CONFIG_PATH = SHELL_GPT_CONFIG_FOLDER / ".sgptrc"
+SHELL_GPT_CONFIG_FOLDER = Path(CONFIG_FOLDER) / "code_gpt"
+SHELL_GPT_CONFIG_PATH = SHELL_GPT_CONFIG_FOLDER / ".cgptrc"
 ROLE_STORAGE_PATH = SHELL_GPT_CONFIG_FOLDER / "roles"
 CHAT_CACHE_PATH = Path(gettempdir()) / "chat_cache"
 CACHE_PATH = Path(gettempdir()) / "cache"
@@ -21,9 +21,9 @@ DEFAULT_CONFIG = {
     "CHAT_CACHE_LENGTH": int(os.getenv("CHAT_CACHE_LENGTH", "100")),
     "CACHE_LENGTH": int(os.getenv("CHAT_CACHE_LENGTH", "100")),
     "REQUEST_TIMEOUT": int(os.getenv("REQUEST_TIMEOUT", "60")),
-    "DEFAULT_MODEL": os.getenv("DEFAULT_MODEL", "gpt-4-1106-preview"),
-    "OPENAI_API_HOST": os.getenv("OPENAI_API_HOST", "https://api.openai.com"),
-    "DEFAULT_COLOR": os.getenv("DEFAULT_COLOR", "magenta"),
+    "LLM_MODEL": os.getenv("LLM_MODEL", "gpt-4-1106-preview"),
+    "LLM_API_HOST": os.getenv("LLM_API_HOST", "https://api.openai.com"),
+    "DEFAULT_COLOR": os.getenv("DEFAULT_COLOR", "cyan"),
     "ROLE_STORAGE_PATH": os.getenv("ROLE_STORAGE_PATH", str(ROLE_STORAGE_PATH)),
     "DEFAULT_EXECUTE_SHELL_CMD": os.getenv("DEFAULT_EXECUTE_SHELL_CMD", "false"),
     "DISABLE_STREAMING": os.getenv("DISABLE_STREAMING", "false"),
@@ -48,9 +48,9 @@ class Config(dict):  # type: ignore
         else:
             config_path.parent.mkdir(parents=True, exist_ok=True)
             # Don't write API key to config file if it is in the environment.
-            if not defaults.get("OPENAI_API_KEY") and not os.getenv("OPENAI_API_KEY"):
-                __api_key = getpass(prompt="Please enter your OpenAI API key: ")
-                defaults["OPENAI_API_KEY"] = __api_key
+            if not defaults.get("LLM_TOKEN") and not os.getenv("LLM_TOKEN"):
+                __api_key = getpass(prompt="Please enter your LLM API key: ")
+                defaults["LLM_TOKEN"] = __api_key
             super().__init__(**defaults)
             self._write()
 

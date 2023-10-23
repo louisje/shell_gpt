@@ -4,6 +4,7 @@ from typing import Dict, Generator, List
 
 import requests
 import typer
+import re
 
 from .cache import Cache
 from .config import SHELL_GPT_CONFIG_PATH, cfg
@@ -43,17 +44,23 @@ class OpenAIClient:
         data = {
             "messages": messages,
             "model": model,
-            "temperature": temperature,
-            "top_p": top_probability,
-            "stream": stream,
+            "parameters": {
+                "frequence_penalty": 1,
+                "temperature": temperature,
+                "top_p": top_probability,
+                "top_k": 50,
+                "max_new_tokens": 2048,
+            },
         }
-        endpoint = f"{self.api_host}/v1/chat/completions"
+        endpoint = f"{self.api_host}/api/models/conversation"
+        if stream:
+            endpoint += "_stream"
         response = requests.post(
             endpoint,
             # Hide API key from Rich traceback.
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.__api_key}",
+                "X-API-KEY": f"{self.__api_key}",
             },
             json=data,
             timeout=REQUEST_TIMEOUT,
@@ -70,19 +77,20 @@ class OpenAIClient:
         # https://github.com/openai/openai-python/blob/237448dc072a2c062698da3f9f512fae38300c1c/openai/api_requestor.py#L98
         if not stream:
             data = response.json()
-            yield data["choices"][0]["message"]["content"]  # type: ignore
+            yield data["generated_text"]  # type: ignore
             return
         for line in response.iter_lines():
             data = line.lstrip(b"data: ").decode("utf-8")
             if data == "[DONE]":  # type: ignore
                 break
-            if not data:
+            if data == "event: ping" or not data:
+                continue
+            if re.search(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}', data):
                 continue
             data = json.loads(data)  # type: ignore
-            delta = data["choices"][0]["delta"]  # type: ignore
-            if "content" not in delta:
+            if "generated_text" not in data:
                 continue
-            yield delta["content"]
+            yield data["generated_text"]
 
     def get_completion(
         self,

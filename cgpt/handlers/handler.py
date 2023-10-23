@@ -13,7 +13,7 @@ from ..role import SystemRole
 class Handler:
     def __init__(self, role: SystemRole) -> None:
         self.client = OpenAIClient(
-            cfg.get("OPENAI_API_HOST"), cfg.get("OPENAI_API_KEY")
+            cfg.get("LLM_API_HOST"), cfg.get("LLM_TOKEN")
         )
         self.role = role
         self.disable_stream = cfg.get("DISABLE_STREAMING") == "false"
