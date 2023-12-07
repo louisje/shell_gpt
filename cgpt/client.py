@@ -51,10 +51,9 @@ class OpenAIClient:
                 "top_k": 50,
                 "max_new_tokens": 2048,
             },
+            "stream": stream,
         }
         endpoint = f"{self.api_host}/api/models/conversation"
-        if stream:
-            endpoint += "_stream"
         response = requests.post(
             endpoint,
             # Hide API key from Rich traceback.
