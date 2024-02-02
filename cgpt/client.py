@@ -28,7 +28,8 @@ class OpenAIClient:
         messages: List[Dict[str, str]],
         model: str = "gpt-3.5-turbo",
         temperature: float = 1,
-        top_probability: float = 1,
+        top_p: float = 1,
+        caching: bool = False,
     ) -> Generator[str, None, None]:
         """
         Make request to OpenAI API, read more:
@@ -37,7 +38,7 @@ class OpenAIClient:
         :param messages: List of messages {"role": user or assistant, "content": message_string}
         :param model: String gpt-3.5-turbo or gpt-3.5-turbo-0301
         :param temperature: Float in 0.0 - 2.0 range.
-        :param top_probability: Float in 0.0 - 1.0 range.
+        :param top_p: Float in 0.0 - 1.0 range.
         :return: Response body JSON.
         """
         stream = DISABLE_STREAMING == "false"
@@ -47,7 +48,7 @@ class OpenAIClient:
             "parameters": {
                 "frequence_penalty": 1,
                 "temperature": temperature,
-                "top_p": top_probability,
+                "top_p": top_p,
                 "top_k": 50,
                 "max_new_tokens": 2048,
             },
@@ -96,8 +97,9 @@ class OpenAIClient:
         messages: List[Dict[str, str]],
         model: str = "gpt-3.5-turbo",
         temperature: float = 1,
-        top_probability: float = 1,
+        top_p: float = 1,
         caching: bool = True,
+        functions: List[Dict[str, str]] = [],
     ) -> Generator[str, None, None]:
         """
         Generates single completion for prompt (message).
@@ -105,7 +107,7 @@ class OpenAIClient:
         :param messages: List of dict with messages and roles.
         :param model: String gpt-3.5-turbo or gpt-3.5-turbo-0301.
         :param temperature: Float in 0.0 - 1.0 range.
-        :param top_probability: Float in 0.0 - 1.0 range.
+        :param top_p: Float in 0.0 - 1.0 range.
         :param caching: Boolean value to enable/disable caching.
         :return: String generated completion.
         """
@@ -113,6 +115,6 @@ class OpenAIClient:
             messages,
             model,
             temperature,
-            top_probability,
-            caching=caching,
+            top_p,
+            caching,
         )

@@ -7,6 +7,8 @@ from click import BadArgumentUsage, MissingParameter
 from click.types import Choice
 
 from cgpt.config import cfg
+from cgpt.default_functions.init_functions import install_functions as inst_funcs
+from cgpt.function import get_openai_schemas
 from cgpt.handlers.chat_handler import ChatHandler
 from cgpt.handlers.default_handler import DefaultHandler
 from cgpt.handlers.repl_handler import ReplHandler
@@ -35,7 +37,7 @@ def main(
         max=2.0,
         help="Randomness of generated output.",
     ),
-    top_probability: float = typer.Option(
+    top_p: float = typer.Option(
         1.0,
         min=0.1,
         max=1.0,
@@ -57,7 +59,14 @@ def main(
     ),
     code: bool = typer.Option(
         False,
+        "--code",
+        "-c",
         help="Generate only code.",
+        rich_help_panel="Assistance Options",
+    ),
+    functions: bool = typer.Option(
+        cfg.get("OPENAI_USE_FUNCTIONS") == "true",
+        help="Allow function calls.",
         rich_help_panel="Assistance Options",
     ),
     editor: bool = typer.Option(
@@ -92,6 +101,8 @@ def main(
     ),
     list_chats: bool = typer.Option(
         False,
+        "--list-chats",
+        "-lc",
         help="List all existing chat ids.",
         callback=ChatHandler.list_ids,
         rich_help_panel="Chat Options",
@@ -115,6 +126,8 @@ def main(
     ),
     list_roles: bool = typer.Option(
         False,
+        "--list-roles",
+        "-lr",
         help="List roles.",
         callback=SystemRole.list,
         rich_help_panel="Role Options",
@@ -123,6 +136,12 @@ def main(
         False,
         help="Install shell integration (ZSH and Bash only)",
         callback=install_shell_integration,
+        hidden=True,  # Hiding since should be used only once.
+    ),
+    install_functions: bool = typer.Option(
+        False,
+        help="Install default functions.",
+        callback=inst_funcs,
         hidden=True,  # Hiding since should be used only once.
     ),
 ) -> None:
@@ -154,15 +173,18 @@ def main(
         else SystemRole.get(role)
     )
 
+    function_schemas = (get_openai_schemas() or None) if functions else None
+
     if repl:
         # Will be in infinite loop here until user exits with Ctrl+C.
         ReplHandler(repl, role_class).handle(
             prompt,
             model=model,
             temperature=temperature,
-            top_probability=top_probability,
+            top_p=top_p,
             chat_id=repl,
             caching=cache,
+            functions=function_schemas,
         )
 
     if chat:
@@ -170,17 +192,19 @@ def main(
             prompt,
             model=model,
             temperature=temperature,
-            top_probability=top_probability,
+            top_p=top_p,
             chat_id=chat,
             caching=cache,
+            functions=function_schemas,
         )
     else:
         full_completion = DefaultHandler(role_class).handle(
             prompt,
             model=model,
             temperature=temperature,
-            top_probability=top_probability,
+            top_p=top_p,
             caching=cache,
+            functions=function_schemas,
         )
 
     while shell and not stdin_passed:
@@ -199,15 +223,15 @@ def main(
                 full_completion,
                 model=model,
                 temperature=temperature,
-                top_probability=top_probability,
+                top_p=top_p,
                 caching=cache,
+                functions=function_schemas,
             )
             continue
         break
 
 
 def entry_point() -> None:
-    # Python package entry point defined in setup.py
     typer.run(main)
 
 
