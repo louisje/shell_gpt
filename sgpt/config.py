@@ -22,9 +22,10 @@ DEFAULT_CONFIG = {
     "CHAT_CACHE_LENGTH": int(os.getenv("CHAT_CACHE_LENGTH", "100")),
     "CACHE_LENGTH": int(os.getenv("CHAT_CACHE_LENGTH", "100")),
     "REQUEST_TIMEOUT": int(os.getenv("REQUEST_TIMEOUT", "60")),
-    "DEFAULT_MODEL": os.getenv("DEFAULT_MODEL", "gpt-4-1106-preview"),
-    "OPENAI_BASE_URL": os.getenv("OPENAI_API_HOST", "https://api.openai.com/v1"),
-    "DEFAULT_COLOR": os.getenv("DEFAULT_COLOR", "magenta"),
+    "DEFAULT_MODEL": os.getenv("DEFAULT_MODEL", "gpt-3.5-turbo"),
+    "OPENAI_BASE_URL": os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+    "FFM_BASE_URL": os.getenv("FFM_BASE_URL", "https://ffm-api.twcc.ai/"),
+    "DEFAULT_COLOR": os.getenv("DEFAULT_COLOR", "cyan"),
     "ROLE_STORAGE_PATH": os.getenv("ROLE_STORAGE_PATH", str(ROLE_STORAGE_PATH)),
     "DEFAULT_EXECUTE_SHELL_CMD": os.getenv("DEFAULT_EXECUTE_SHELL_CMD", "false"),
     "DISABLE_STREAMING": os.getenv("DISABLE_STREAMING", "false"),
@@ -52,9 +53,10 @@ class Config(dict):  # type: ignore
         else:
             config_path.parent.mkdir(parents=True, exist_ok=True)
             # Don't write API key to config file if it is in the environment.
-            if not defaults.get("OPENAI_API_KEY") and not os.getenv("OPENAI_API_KEY"):
-                __api_key = getpass(prompt="Please enter your OpenAI API key: ")
-                defaults["OPENAI_API_KEY"] = __api_key
+            key_name = "FFM_API_KEY" if defaults.get("DEFAULT_MODEL").startwith("ffm-") else "OPENAI_API_KEY"
+            if not defaults.get(key_name) and not os.getenv(key_name):
+                __api_key = getpass(prompt="Please enter your API key: ")
+                defaults[key_name] = __api_key
             super().__init__(**defaults)
             self._write()
 

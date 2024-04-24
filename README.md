@@ -375,10 +375,10 @@ This is just some examples of what we can do using OpenAI GPT models, I'm sure y
 ### Runtime configuration file
 You can setup some parameters in runtime configuration file `~/.config/shell_gpt/.sgptrc`:
 ```text
-# API key, also it is possible to define OPENAI_API_KEY env.
-OPENAI_API_KEY=your_api_key
+# API key, also it is possible to define OPENAI_TOKEN env.
+OPENAI_TOKEN=your_api_key
 # OpenAI host, useful if you would like to use proxy.
-OPENAI_API_HOST=https://api.openai.com
+OPENAI_BASE_URL=https://api.openai.com/v1
 # Max amount of cached message per chat session.
 CHAT_CACHE_LENGTH=100
 # Chat cache folder.
@@ -391,7 +391,7 @@ CACHE_PATH=/tmp/shell_gpt/cache
 REQUEST_TIMEOUT=60
 # Default OpenAI model to use.
 DEFAULT_MODEL=gpt-3.5-turbo
-# Default color for shell and code completions.
+# Default color for OpenAI completions.
 DEFAULT_COLOR=magenta
 # When in --shell mode, default to "Y" for no input.
 DEFAULT_EXECUTE_SHELL_CMD=false
@@ -448,18 +448,18 @@ Possible options for `CODE_THEME`: https://pygments.org/styles/
 By default, ShellGPT leverages OpenAI's large language models. However, it also provides the flexibility to use locally hosted models, which can be a cost-effective alternative. To use local models, you will need to run your own API server. You can accomplish this by using [LocalAI](https://github.com/go-skynet/LocalAI), a self-hosted, OpenAI-compatible API. Setting up LocalAI allows you to run language models on your own hardware, potentially without the need for an internet connection, depending on your usage. To set up your LocalAI, please follow this comprehensive [guide](https://github.com/TheR1D/shell_gpt/wiki/LocalAI). Remember that the performance of your local models may depend on the specifications of your hardware and the specific language model you choose to deploy.
 
 ## Docker
-Run the container using the `OPENAI_API_KEY` environment variable, and a docker volume to store cache:
+Run the container using the `OPENAI_TOKEN` environment variable, and a docker volume to store cache:
 ```shell
 docker run --rm \
-           --env OPENAI_API_KEY="your OPENAI API key" \
+           --env OPENAI_TOKEN="your OPENAI API key" \
            --volume gpt-cache:/tmp/shell_gpt \
        ghcr.io/ther1d/shell_gpt --chat rainbow "what are the colors of a rainbow"
 ```
 
-Example of a conversation, using an alias and the `OPENAI_API_KEY` environment variable:
+Example of a conversation, using an alias and the `OPENAI_TOKEN` environment variable:
 ```shell
-alias sgpt="docker run --rm --env OPENAI_API_KEY --volume gpt-cache:/tmp/shell_gpt ghcr.io/ther1d/shell_gpt"
-export OPENAI_API_KEY="your OPENAI API key"
+alias sgpt="docker run --rm --env OPENAI_TOKEN --volume gpt-cache:/tmp/shell_gpt ghcr.io/ther1d/shell_gpt"
+export OPENAI_TOKEN="your OPENAI API key"
 sgpt --chat rainbow "what are the colors of a rainbow"
 sgpt --chat rainbow "inverse the list of your last answer"
 sgpt --chat rainbow "translate your last answer in french"
