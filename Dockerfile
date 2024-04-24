@@ -4,8 +4,8 @@ WORKDIR /app
 COPY . /app
 
 RUN apt-get update && apt-get install -y gcc
-RUN pip install --no-cache /app && mkdir -p /tmp/code_gpt
+RUN pip install --no-cache /app && mkdir -p /tmp/shell_gpt
 
-VOLUME /tmp/code_gpt
+VOLUME /tmp/shell_gpt
 
-ENTRYPOINT ["cgpt"]
+ENTRYPOINT ["sgpt"]

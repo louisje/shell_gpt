@@ -7,8 +7,8 @@ from typing import Any, Callable
 import typer
 from click import BadParameter, UsageError
 
-from cgpt.__version__ import __version__
-from cgpt.integration import bash_integration, zsh_integration
+from sgpt.__version__ import __version__
+from sgpt.integration import bash_integration, zsh_integration
 
 
 def get_edited_prompt() -> str:

@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "code_gpt"
+name = "shell_gpt"
 description = "A command-line productivity tool powered by OpenAI GPT models, will help you accomplish your tasks faster and more efficiently."
 keywords = ["shell", "gpt", "openai", "cli", "productivity", "cheet-sheet"]
 readme = "README.md"
@@ -39,12 +39,12 @@ dependencies = [
 ]
 
 [project.scripts]
-cgpt = "cgpt:cli"
+sgpt = "sgpt:cli"
 
 [project.urls]
-homepage = "https://github.com/louisje/code_gpt"
-repository = "https://github.com/louisje/code_gpt"
-documentation = "https://github.com/louisje/code_gpt/blob/main/README.md"
+homepage = "https://github.com/louisje/shell_gpt"
+repository = "https://github.com/louisje/shell_gpt"
+documentation = "https://github.com/louisje/shell_gpt/blob/main/README.md"
 
 [project.optional-dependencies]
 test = [
@@ -62,14 +62,14 @@ dev = [
 ]
 
 [tool.hatch.version]
-path = "cgpt/__version__.py"
+path = "sgpt/__version__.py"
 
 [tool.hatch.build.targets.wheel]
-only-include = ["cgpt"]
+only-include = ["sgpt"]
 
 [tool.hatch.build.targets.sdist]
 only-include = [
-    "cgpt",
+    "sgpt",
     "tests",
     "README.md",
     "LICENSE",

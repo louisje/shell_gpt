@@ -19,9 +19,16 @@ cache = Cache(int(cfg.get("CACHE_LENGTH")), Path(cfg.get("CACHE_PATH")))
 
 class Handler:
     def __init__(self, role: SystemRole) -> None:
-        self.client = OpenAIClient(
-            cfg.get("LLM_API_HOST"), cfg.get("LLM_TOKEN")
-        )
+        if cfg.get("DEFAULT_MODEL").startswith("ffm-"):
+            self.client = OpenAIClient(
+                cfg.get("FFM_BASE_URL"), cfg.get("FFM_API_KEY")
+            )
+        else:
+            self.client = OpenAI(
+                base_url=cfg.get("OPENAI_BASE_URL"),
+                api_key=cfg.get("OPENAI_API_KEY"),
+                timeout=int(cfg.get("REQUEST_TIMEOUT")),
+            )
         self.role = role
         self.disable_stream = cfg.get("DISABLE_STREAMING") == "true"
         self.show_functions_output = cfg.get("SHOW_FUNCTIONS_OUTPUT") == "true"
@@ -91,7 +98,48 @@ class Handler:
     # TODO: Fix MyPy typing errors. This modules is excluded from MyPy checks.
     @cache
     def get_completion(self, **kwargs: Any) -> Generator[str, None, None]:
-        yield from self.client.get_completion(**kwargs)
+        if cfg.get("DEFAULT_MODEL").startswith("ffm-"):
+            yield from self.client.get_completion(**kwargs)
+        else:
+            func_call = {"name": None, "arguments": ""}
+
+            is_shell_role = self.role.name == DefaultRoles.SHELL.value
+            is_code_role = self.role.name == DefaultRoles.CODE.value
+            is_dsc_shell_role = self.role.name == DefaultRoles.DESCRIBE_SHELL.value
+            if is_shell_role or is_code_role or is_dsc_shell_role:
+                kwargs["functions"] = None
+
+            if self.disable_stream:
+                completion = self.client.chat.completions.create(**kwargs)
+                message = completion.choices[0].message
+                if completion.choices[0].finish_reason == "function_call":
+                    name, arguments = (
+                        message.function_call.name,
+                        message.function_call.arguments,
+                    )
+                    yield from self.handle_function_call(
+                        kwargs["messages"], name, arguments
+                    )
+                    yield from self.get_completion(**kwargs, caching=False)
+                yield message.content or ""
+                return
+
+            for chunk in self.client.chat.completions.create(**kwargs, stream=True):
+                delta = chunk.choices[0].delta
+                if delta.function_call:
+                    if delta.function_call.name:
+                        func_call["name"] = delta.function_call.name
+                    if delta.function_call.arguments:
+                        func_call["arguments"] += delta.function_call.arguments
+                if chunk.choices[0].finish_reason == "function_call":
+                    name, arguments = func_call["name"], func_call["arguments"]
+                    yield from self.handle_function_call(
+                        kwargs["messages"], name, arguments
+                    )
+                    yield from self.get_completion(**kwargs, caching=False)
+                    return
+
+                yield delta.content or ""
 
     def handle(self, prompt: str, **kwargs: Any) -> str:
         default = DefaultRoles.DEFAULT.value

@@ -8,14 +8,14 @@ import typer
 from click import BadArgumentUsage
 from click.types import Choice
 
-from cgpt.config import cfg
-from cgpt.function import get_openai_schemas
-from cgpt.handlers.chat_handler import ChatHandler
-from cgpt.handlers.default_handler import DefaultHandler
-from cgpt.handlers.repl_handler import ReplHandler
-from cgpt.llm_functions.init_functions import install_functions as inst_funcs
-from cgpt.role import DefaultRoles, SystemRole
-from cgpt.utils import (
+from sgpt.config import cfg
+from sgpt.function import get_openai_schemas
+from sgpt.handlers.chat_handler import ChatHandler
+from sgpt.handlers.default_handler import DefaultHandler
+from sgpt.handlers.repl_handler import ReplHandler
+from sgpt.llm_functions.init_functions import install_functions as inst_funcs
+from sgpt.role import DefaultRoles, SystemRole
+from sgpt.utils import (
     get_edited_prompt,
     get_sgpt_version,
     install_shell_integration,
@@ -30,7 +30,7 @@ def main(
         help="The prompt to generate completions for.",
     ),
     model: str = typer.Option(
-        cfg.get("LLM_MODEL"),
+        cfg.get("DEFAULT_MODEL"),
         help="Large language model to use.",
     ),
     temperature: float = typer.Option(

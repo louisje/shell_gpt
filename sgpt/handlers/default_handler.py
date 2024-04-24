@@ -17,6 +17,6 @@ class DefaultHandler(Handler):
     def make_messages(self, prompt: str) -> List[Dict[str, str]]:
         messages = [
             {"role": "system", "content": self.role.role},
-            {"role": "human", "content": prompt},
+            {"role": "human" if cfg.get("DEFAULT_MODEL").startswith("ffm-") else "user", "content": prompt},
         ]
         return messages
