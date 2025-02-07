@@ -33,8 +33,14 @@ def main(
         cfg.get("DEFAULT_MODEL"),
         help="Large language model to use.",
     ),
+    max_tokens: int = typer.Option(
+        cfg.get("MAX_TOKENS"),
+        min=0,
+        max=128000,
+        help="Max tokens of generated output.",
+    ),
     temperature: float = typer.Option(
-        0.0,
+        cfg.get("TEMPERATURE"),
         min=0.0,
         max=2.0,
         help="Randomness of generated output.",
@@ -210,6 +216,7 @@ def main(
         ReplHandler(repl, role_class, md).handle(
             init_prompt=prompt,
             model=model,
+            max_tokens=max_tokens,
             temperature=temperature,
             top_p=top_p,
             caching=cache,
@@ -220,6 +227,7 @@ def main(
         full_completion = ChatHandler(chat, role_class, md).handle(
             prompt=prompt,
             model=model,
+            max_tokens=max_tokens,
             temperature=temperature,
             top_p=top_p,
             caching=cache,
@@ -229,6 +237,7 @@ def main(
         full_completion = DefaultHandler(role_class, md).handle(
             prompt=prompt,
             model=model,
+            max_tokens=max_tokens,
             temperature=temperature,
             top_p=top_p,
             caching=cache,
@@ -250,6 +259,7 @@ def main(
             DefaultHandler(DefaultRoles.DESCRIBE_SHELL.get_role(), md).handle(
                 full_completion,
                 model=model,
+                max_tokens=max_tokens,
                 temperature=temperature,
                 top_p=top_p,
                 caching=cache,

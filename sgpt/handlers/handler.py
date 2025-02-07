@@ -86,6 +86,7 @@ class Handler:
     def get_completion(
         self,
         model: str,
+        max_tokens: int,
         temperature: float,
         top_p: float,
         messages: List[Dict[str, Any]],
@@ -105,6 +106,7 @@ class Handler:
 
         response = completion(
             model=model,
+            max_tokens=max_tokens,
             temperature=temperature,
             top_p=top_p,
             messages=messages,
@@ -130,6 +132,7 @@ class Handler:
                     yield from self.handle_function_call(messages, name, arguments)
                     yield from self.get_completion(
                         model=model,
+                        max_tokens=max_tokens,
                         temperature=temperature,
                         top_p=top_p,
                         messages=messages,
@@ -146,6 +149,7 @@ class Handler:
         self,
         prompt: str,
         model: str,
+        max_tokens: int,
         temperature: float,
         top_p: float,
         caching: bool,
@@ -156,6 +160,7 @@ class Handler:
         messages = self.make_messages(prompt.strip())
         generator = self.get_completion(
             model=model,
+            max_tokens=max_tokens,
             temperature=temperature,
             top_p=top_p,
             messages=messages,
