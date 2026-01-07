@@ -30,8 +30,8 @@ DEFAULT_CONFIG = {
     "DEFAULT_EXECUTE_SHELL_CMD": os.getenv("DEFAULT_EXECUTE_SHELL_CMD", "false"),
     "DISABLE_STREAMING": os.getenv("DISABLE_STREAMING", "false"),
     "CODE_THEME": os.getenv("CODE_THEME", "dracula"),
-    "OPENAI_FUNCTIONS_PATH": os.getenv("OPENAI_FUNCTIONS_PATH", str(FUNCTIONS_PATH)),
-    "OPENAI_USE_FUNCTIONS": os.getenv("OPENAI_USE_FUNCTIONS", "true"),
+    "TWCC_FUNCTIONS_PATH": os.getenv("TWCC_FUNCTIONS_PATH", str(FUNCTIONS_PATH)),
+    "TWCC_USE_FUNCTIONS": os.getenv("TWCC_USE_FUNCTIONS", "true"),
     "SHOW_FUNCTIONS_OUTPUT": os.getenv("SHOW_FUNCTIONS_OUTPUT", "false"),
     "API_BASE_URL": os.getenv("API_BASE_URL", "default"),
     "PRETTIFY_MARKDOWN": os.getenv("PRETTIFY_MARKDOWN", "true"),
@@ -59,9 +59,9 @@ class Config(dict):  # type: ignore
         else:
             config_path.parent.mkdir(parents=True, exist_ok=True)
             # Don't write API key to config file if it is in the environment.
-            if not defaults.get("OPENAI_API_KEY") and not os.getenv("OPENAI_API_KEY"):
-                __api_key = getpass(prompt="Please enter your OpenAI API key: ")
-                defaults["OPENAI_API_KEY"] = __api_key
+            if not defaults.get("TWCC_API_KEY") and not os.getenv("TWCC_API_KEY"):
+                __api_key = getpass(prompt="Please enter your TWCC API key: ")
+                defaults["TWCC_API_KEY"] = __api_key
             super().__init__(**defaults)
             self._write()
 

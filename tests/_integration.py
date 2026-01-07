@@ -2,7 +2,7 @@
 This test module will execute real commands using shell.
 This means it will call sgpt.py with command line arguments.
 Make sure you have your API key in place ~/.cfg/shell_gpt/.sgptrc
-or ENV variable OPENAI_API_KEY.
+or ENV variable TWCC_API_KEY.
 It is useful for quick tests, saves a bit time.
 """
 
@@ -37,7 +37,7 @@ class TestShellGpt(TestCase):
         # ShellGPT optimised and tested with gpt-4 turbo.
         assert cfg.get("DEFAULT_MODEL") == "gpt-4o"
         # Make sure we will not call any functions.
-        assert cfg.get("OPENAI_USE_FUNCTIONS") == "false"
+        assert cfg.get("TWCC_USE_FUNCTIONS") == "false"
 
     @staticmethod
     def get_arguments(prompt, **kwargs):

@@ -7,7 +7,7 @@ from typing import Any
 from ..config import cfg
 from ..utils import option_callback
 
-FUNCTIONS_FOLDER = Path(cfg.get("OPENAI_FUNCTIONS_PATH"))
+FUNCTIONS_FOLDER = Path(cfg.get("TWCC_FUNCTIONS_PATH"))
 
 
 @option_callback

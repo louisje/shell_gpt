@@ -46,7 +46,7 @@ class Function:
         return module
 
 
-functions_folder = Path(cfg.get("OPENAI_FUNCTIONS_PATH"))
+functions_folder = Path(cfg.get("TWCC_FUNCTIONS_PATH"))
 functions_folder.mkdir(parents=True, exist_ok=True)
 functions = [Function(str(path)) for path in functions_folder.glob("*.py")]
 

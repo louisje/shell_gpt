@@ -83,7 +83,7 @@ def main(
         rich_help_panel="Assistance Options",
     ),
     functions: bool = typer.Option(
-        cfg.get("OPENAI_USE_FUNCTIONS") == "true",
+        cfg.get("TWCC_USE_FUNCTIONS") == "true",
         help="Allow function calls.",
         rich_help_panel="Assistance Options",
     ),
