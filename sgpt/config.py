@@ -33,7 +33,7 @@ DEFAULT_CONFIG = {
     "TWCC_FUNCTIONS_PATH": os.getenv("TWCC_FUNCTIONS_PATH", str(FUNCTIONS_PATH)),
     "TWCC_USE_FUNCTIONS": os.getenv("TWCC_USE_FUNCTIONS", "true"),
     "SHOW_FUNCTIONS_OUTPUT": os.getenv("SHOW_FUNCTIONS_OUTPUT", "false"),
-    "API_BASE_URL": os.getenv("API_BASE_URL", "default"),
+    "API_BASE_URL": os.getenv("TWCC_API_BASE", "default"),
     "PRETTIFY_MARKDOWN": os.getenv("PRETTIFY_MARKDOWN", "true"),
     "USE_LITELLM": os.getenv("USE_LITELLM", "false"),
     "SHELL_INTERACTION": os.getenv("SHELL_INTERACTION ", "true"),
