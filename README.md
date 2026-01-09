@@ -9,6 +9,33 @@ pip install shell-gpt
 ```
 By default, ShellGPT uses OpenAI's API and GPT-4 model. You'll need an API key, you can generate one [here](https://beta.openai.com/account/api-keys). You will be prompted for your key which will then be stored in `~/.config/shell_gpt/.sgptrc`. OpenAI API is not free of charge, please refer to the [OpenAI pricing](https://openai.com/pricing) for more information.
 
+### Development Installation
+For developers who want to contribute or modify ShellGPT:
+```shell
+# Clone the repository
+git clone https://github.com/TheR1D/shell_gpt.git
+cd shell_gpt
+
+# Install development dependencies
+make dev-setup
+
+# Run tests
+make test
+
+# See all available commands
+make help
+```
+
+Available make commands for development:
+- `make install-dev` - Install with development dependencies
+- `make test` - Run tests
+- `make lint` - Check code quality
+- `make format` - Format code with black and isort
+- `make build` - Build package
+- `make clean` - Clean build artifacts
+
+For more details, see the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
 > [!TIP]
 > Alternatively, you can use locally hosted open source models which are available for free. To use local models, you will need to run your own LLM backend server such as [Ollama](https://github.com/ollama/ollama). To set up ShellGPT with Ollama, please follow this comprehensive [guide](https://github.com/TheR1D/shell_gpt/wiki/Ollama).
 >
@@ -108,7 +135,7 @@ This is a **very handy feature**, which allows you to use `sgpt` shell completio
 
 https://github.com/TheR1D/shell_gpt/assets/16740832/bead0dab-0dd9-436d-88b7-6abfb2c556c1
 
-To install shell integration, run `sgpt --install-integration` and restart your terminal to apply changes. This will add few lines to your `.bashrc` or `.zshrc` file. After that, you can use `Ctrl+l` (by default) to invoke ShellGPT. When you press `Ctrl+l` it will replace you current input line (buffer) with suggested command. You can then edit it and just press `Enter` to execute.
+To install shell integration, run `sgpt --install-integration` and restart your terminal to apply changes. This will add few lines to your `.bashrc` or `.zshrc` file. After that, you can use `Ctrl+b` (by default) to invoke ShellGPT. When you press `Ctrl+b` it will replace you current input line (buffer) with suggested command. You can then edit it and just press `Enter` to execute.
 
 ### Generating code
 By using the `--code` or `-c` parameter, you can specifically request pure code output, for instance:
