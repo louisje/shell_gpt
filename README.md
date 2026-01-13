@@ -193,7 +193,43 @@ for i in range(1, 101):
 ### Chat Mode 
 Often it is important to preserve and recall a conversation. `sgpt` creates conversational dialogue with each LLM completion requested. The dialogue can develop one-by-one (chat mode) or interactively, in a REPL loop (REPL mode). Both ways rely on the same underlying object, called a chat session. The session is located at the [configurable](#runtime-configuration-file) `CHAT_CACHE_PATH`.
 
-To start a conversation, use the `--chat` option followed by a unique session name and a prompt.
+#### Automatic conversation persistence (New in v1.4.5.post1)
+By default, all conversations are now automatically saved to a "default" session, even without using the `--chat` option. This means your conversation history is preserved across multiple `sgpt` invocations:
+
+```shell
+# First conversation - automatically saved to "default" session
+sgpt "What is Python?"
+# -> Python is a high-level, interpreted programming language...
+
+# Second conversation - continues in "default" session with context
+sgpt "Give me an example"
+# -> Here's a simple Python example...
+
+# View the conversation history
+sgpt --show-chat default
+# -> user: What is Python?
+# -> assistant: Python is a high-level, interpreted programming language...
+# -> user: Give me an example
+# -> assistant: Here's a simple Python example...
+```
+
+#### Resume last conversation
+You can quickly resume your last used chat session with the `--resume` or `-r` option:
+
+```shell
+# Resume the most recently used chat session
+sgpt --resume "Continue the previous topic"
+# -> Resuming chat session: python_tutorial
+# -> Sure, let's continue...
+
+# Or use the shorthand
+sgpt -r "Tell me more"
+```
+
+If no previous chat sessions exist, `--resume` will automatically create a new "default" session.
+
+#### Named chat sessions
+To start a conversation with a specific name, use the `--chat` option followed by a unique session name and a prompt.
 ```shell
 sgpt --chat conversation_1 "please remember my favorite number: 4"
 # -> I will remember that your favorite number is 4.
@@ -470,6 +506,7 @@ Possible options for `CODE_THEME`: https://pygments.org/styles/
 │ --repl                 TEXT  Start a REPL (Read–eval–print loop) session. [default: None]                │
 │ --show-chat            TEXT  Show all messages from provided chat id. [default: None]                    │
 │ --list-chats  -lc            List all existing chat ids.                                                 │
+│ --resume      -r             Resume last used chat session.                                              │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Role Options ───────────────────────────────────────────────────────────────────────────────────────────╮
 │ --role                  TEXT  System role for GPT model. [default: None]                                 │

@@ -106,6 +106,13 @@ def main(
         help="Follow conversation with id, " 'use "temp" for quick session.',
         rich_help_panel="Chat Options",
     ),
+    resume: bool = typer.Option(
+        False,
+        "--resume",
+        "-r",
+        help="Resume last chat session.",
+        rich_help_panel="Chat Options",
+    ),
     repl: str = typer.Option(
         None,
         help="Start a REPL (Read–eval–print loop) session.",
@@ -200,6 +207,21 @@ def main(
     if chat and repl:
         raise BadArgumentUsage("--chat and --repl options cannot be used together.")
 
+    if chat and resume:
+        raise BadArgumentUsage("--chat and --resume options cannot be used together.")
+
+    if resume:
+        # Get the last used chat session
+        chat_sessions = ChatHandler.chat_session.list()
+        if chat_sessions:
+            # Use the last modified chat session
+            chat = chat_sessions[-1].name
+            typer.secho(f"Resuming chat session: {chat}", fg="cyan")
+        else:
+            # If no chat session exists, create a default one
+            chat = "default"
+            typer.secho("No previous chat session found. Starting new default session.", fg="cyan")
+
     if editor and stdin_passed:
         raise BadArgumentUsage("--editor option cannot be used with stdin input.")
 
@@ -226,26 +248,19 @@ def main(
             functions=function_schemas,
         )
 
-    if chat:
-        full_completion = ChatHandler(chat, role_class, md).handle(
-            prompt=prompt,
-            model=model,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            caching=cache,
-            functions=function_schemas,
-        )
-    else:
-        full_completion = DefaultHandler(role_class, md).handle(
-            prompt=prompt,
-            model=model,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            caching=cache,
-            functions=function_schemas,
-        )
+    # If no chat is specified, use "default" session
+    if not chat:
+        chat = "default"
+    
+    full_completion = ChatHandler(chat, role_class, md).handle(
+        prompt=prompt,
+        model=model,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        top_p=top_p,
+        caching=cache,
+        functions=function_schemas,
+    )
 
     session: PromptSession[str] = PromptSession()
 
