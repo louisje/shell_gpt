@@ -248,19 +248,38 @@ def main(
             functions=function_schemas,
         )
 
-    # If no chat is specified, use "default" session
-    if not chat:
-        chat = "default"
-    
-    full_completion = ChatHandler(chat, role_class, md).handle(
-        prompt=prompt,
-        model=model,
-        max_tokens=max_tokens,
-        temperature=temperature,
-        top_p=top_p,
-        caching=cache,
-        functions=function_schemas,
-    )
+    # Use DefaultHandler for single-shot modes (--shell, --code, --describe-shell)
+    # unless explicitly using --chat to maintain conversation history
+    if chat or (not shell and not code and not describe_shell):
+        # Use ChatHandler for persistent conversations
+        explicit_chat = chat is not None  # Track if user explicitly specified --chat
+        if not chat:
+            chat = "default"
+        
+        # Clear default chat unless --resume or explicit --chat was used
+        if chat == "default" and not explicit_chat and not resume:
+            ChatHandler.chat_session.invalidate(chat)
+        
+        full_completion = ChatHandler(chat, role_class, md).handle(
+            prompt=prompt,
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            caching=cache,
+            functions=function_schemas,
+        )
+    else:
+        # Use DefaultHandler for single-shot interactions
+        full_completion = DefaultHandler(role_class, md).handle(
+            prompt=prompt,
+            model=model,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            caching=cache,
+            functions=function_schemas,
+        )
 
     session: PromptSession[str] = PromptSession()
 

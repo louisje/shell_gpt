@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5.post2] - 2026-01-15
+
+### Fixed
+- 修復 shell 集成（Ctrl-S）與 default 聊天角色衝突的問題
+  - `--shell`、`--code`、`--describe-shell` 模式現在預設使用單次對話（DefaultHandler）
+  - 只有明確使用 `--chat` 選項時，這些模式才會啟用持久對話
+  - 每次啟動預設對話時會清除舊的 default 聊天記錄（除非使用 `--resume` 或明確指定 `--chat`）
+
+### Changed
+- 改進 `--chat temp` 的行為
+  - temp 對話現在在連續使用時會保持狀態
+  - 只有切換到其他對話 ID 時才會清除 temp 對話
+  - 添加了最後使用的聊天 ID 追踪功能
+
 ## [1.4.5.post1] - 2026-01-13
 
 ### Added

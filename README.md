@@ -135,7 +135,7 @@ This is a **very handy feature**, which allows you to use `sgpt` shell completio
 
 https://github.com/TheR1D/shell_gpt/assets/16740832/bead0dab-0dd9-436d-88b7-6abfb2c556c1
 
-To install shell integration, run `sgpt --install-integration` and restart your terminal to apply changes. This will add few lines to your `.bashrc` or `.zshrc` file. After that, you can use `Ctrl+b` (by default) to invoke ShellGPT. When you press `Ctrl+b` it will replace you current input line (buffer) with suggested command. You can then edit it and just press `Enter` to execute.
+To install shell integration, run `sgpt --install-integration` and restart your terminal to apply changes. This will add few lines to your `.bashrc` or `.zshrc` file. After that, you can use `Ctrl+S` (by default) to invoke ShellGPT. When you press `Ctrl+S` it will replace you current input line (buffer) with suggested command. You can then edit it and just press `Enter` to execute.
 
 ### Generating code
 By using the `--code` or `-c` parameter, you can specifically request pure code output, for instance:

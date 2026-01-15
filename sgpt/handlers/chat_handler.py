@@ -33,6 +33,17 @@ class ChatSession:
         self.length = length
         self.storage_path = storage_path
         self.storage_path.mkdir(parents=True, exist_ok=True)
+        self.last_chat_file = self.storage_path / ".last_chat_id"
+
+    def get_last_chat_id(self) -> Optional[str]:
+        """Get the last used chat ID."""
+        if self.last_chat_file.exists():
+            return self.last_chat_file.read_text().strip()
+        return None
+
+    def set_last_chat_id(self, chat_id: str) -> None:
+        """Set the last used chat ID."""
+        self.last_chat_file.write_text(chat_id)
 
     def __call__(self, func: Callable[..., Any]) -> Callable[..., Any]:
         """
@@ -103,9 +114,14 @@ class ChatHandler(Handler):
         self.chat_id = chat_id
         self.role = role
 
-        if chat_id == "temp":
-            # If the chat id is "temp", we don't want to save the chat session.
-            self.chat_session.invalidate(chat_id)
+        # Handle temp chat: only clear if switching from a different chat
+        last_chat_id = self.chat_session.get_last_chat_id()
+        if last_chat_id and last_chat_id == "temp" and chat_id != "temp":
+            # Switching away from temp, clear it
+            self.chat_session.invalidate("temp")
+        
+        # Update last chat ID
+        self.chat_session.set_last_chat_id(chat_id)
 
         self.validate()
 
