@@ -226,7 +226,31 @@ sgpt --resume "Continue the previous topic"
 sgpt -r "Tell me more"
 ```
 
-If no previous chat sessions exist, `--resume` will automatically create a new "default" session.
+Alternatively, you can use `--chat last` to achieve the same result:
+```shell
+sgpt --chat last "Continue where we left off"
+# -> Resuming chat session: python_tutorial
+```
+
+If no previous chat sessions exist, `--resume` will automatically create a new "default" session, while `--chat last` will show an error.
+
+#### Auto-named chat sessions (New in v1.4.5.post3)
+Use `--chat auto` to let AI automatically generate a descriptive name for your chat session based on the conversation content:
+
+```shell
+sgpt --chat auto "How do I read a JSON file in Python?"
+# -> Here's how to read a JSON file in Python...
+# -> Chat session created: python_json_reading
+
+# Continue the conversation using the generated name
+sgpt --chat python_json_reading "What about writing to JSON?"
+# -> To write data to a JSON file...
+
+# Or simply resume with --chat last
+sgpt --chat last "Show me error handling"
+```
+
+The generated name uses only lowercase letters, numbers, and hyphens (max 50 characters). If a name already exists, a numeric suffix is added automatically (e.g., `python-help-2`).
 
 #### Named chat sessions
 To start a conversation with a specific name, use the `--chat` option followed by a unique session name and a prompt.
@@ -502,7 +526,8 @@ Possible options for `CODE_THEME`: https://pygments.org/styles/
 │ --functions           --no-functions      Allow function calls. [default: functions]                     │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Chat Options ───────────────────────────────────────────────────────────────────────────────────────────╮
-│ --chat                 TEXT  Follow conversation with id, use "temp" for quick session. [default: None]  │
+│ --chat                 TEXT  Follow conversation with id. Use "temp" for quick session, "auto" for       │
+│                              AI-generated name, "last" to resume last session. [default: None]           │
 │ --repl                 TEXT  Start a REPL (Read–eval–print loop) session. [default: None]                │
 │ --show-chat            TEXT  Show all messages from provided chat id. [default: None]                    │
 │ --list-chats  -lc            List all existing chat ids.                                                 │

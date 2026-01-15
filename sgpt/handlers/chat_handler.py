@@ -92,6 +92,32 @@ class ChatSession:
         file_path = self.storage_path / chat_id
         file_path.unlink(missing_ok=True)
 
+    def rename(self, old_id: str, new_id: str) -> str:
+        """
+        Rename a chat session file.
+        If new_id already exists, append a numeric suffix.
+        Returns the final new_id used.
+        """
+        old_path = self.storage_path / old_id
+        if not old_path.exists():
+            return old_id
+
+        # Handle name conflicts by adding numeric suffix
+        final_id = new_id
+        counter = 2
+        while (self.storage_path / final_id).exists():
+            final_id = f"{new_id}-{counter}"
+            counter += 1
+
+        new_path = self.storage_path / final_id
+        old_path.rename(new_path)
+
+        # Update last chat ID if it was the renamed one
+        if self.get_last_chat_id() == old_id:
+            self.set_last_chat_id(final_id)
+
+        return final_id
+
     def get_messages(self, chat_id: str) -> List[str]:
         messages = self._read(chat_id)
         return [f"{message['role']}: {message['content']}" for message in messages]
@@ -100,8 +126,8 @@ class ChatSession:
         return bool(chat_id and bool(self._read(chat_id)))
 
     def list(self) -> List[Path]:
-        # Get all files in the folder.
-        files = self.storage_path.glob("*")
+        # Get all files in the folder, excluding hidden files like .last_chat_id.
+        files = [f for f in self.storage_path.glob("*") if not f.name.startswith(".")]
         # Sort files by last modification time in ascending order.
         return sorted(files, key=lambda f: f.stat().st_mtime)
 
@@ -142,9 +168,9 @@ class ChatHandler(Handler):
     @classmethod
     @option_callback
     def list_ids(cls, value: str) -> None:
-        # Prints all existing chat IDs to the console.
-        for chat_id in cls.chat_session.list():
-            typer.echo(chat_id)
+        # Prints all existing chat IDs (names only) to the console.
+        for chat_path in cls.chat_session.list():
+            typer.echo(chat_path.name)
 
     @classmethod
     def show_messages(cls, chat_id: str, markdown: bool) -> None:

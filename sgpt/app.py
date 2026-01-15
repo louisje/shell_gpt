@@ -1,4 +1,6 @@
 import os
+import re
+import uuid
 
 # To allow users to use arrow keys in the REPL.
 import readline  # noqa: F401
@@ -22,6 +24,41 @@ from sgpt.utils import (
     install_shell_integration,
     run_command,
 )
+
+
+def generate_chat_name(prompt: str, model: str) -> str:
+    """
+    Generate a short chat name based on the user's prompt using AI.
+    Returns a sanitized name suitable for use as a filename.
+    """
+    from sgpt.handlers.handler import additional_kwargs, completion
+
+    name_prompt = (
+        "Based on the following user message, generate a very short descriptive name "
+        "(2-5 words, max 50 characters) for this chat session. "
+        "Use only lowercase English letters, numbers, and hyphens. "
+        "No spaces, no special characters. Output ONLY the name, nothing else.\n\n"
+        f"User message: {prompt[:500]}"  # Limit prompt length
+    )
+
+    try:
+        response = completion(
+            model=model,
+            messages=[{"role": "user", "content": name_prompt}],
+            max_tokens=100,
+            temperature=0.35,
+            **additional_kwargs,
+        )
+        # Extract the generated name
+        generated_name = response.choices[0].message.content.strip()
+        # Sanitize: only keep alphanumeric and hyphens, limit length
+        sanitized = re.sub(r"[^a-z0-9\-]", "-", generated_name.lower())
+        sanitized = re.sub(r"-+", "-", sanitized).strip("-")  # Remove duplicate/trailing hyphens
+        sanitized = sanitized[:50]  # Limit length
+        return sanitized if sanitized else f"chat-{uuid.uuid4().hex[:8]}"
+    except Exception:
+        # Fallback to UUID-based name if AI generation fails
+        return f"chat-{uuid.uuid4().hex[:8]}"
 
 
 def main(
@@ -103,7 +140,8 @@ def main(
     ),
     chat: str = typer.Option(
         None,
-        help="Follow conversation with id, " 'use "temp" for quick session.',
+        help='Follow conversation with id. Use "temp" for quick session, '
+        '"auto" for AI-generated name, "last" to resume last session.',
         rich_help_panel="Chat Options",
     ),
     resume: bool = typer.Option(
@@ -210,17 +248,26 @@ def main(
     if chat and resume:
         raise BadArgumentUsage("--chat and --resume options cannot be used together.")
 
+    # Handle --chat last (same as --resume but using --chat syntax)
+    if chat == "last":
+        last_chat_id = ChatHandler.chat_session.get_last_chat_id()
+        if last_chat_id:
+            chat = last_chat_id
+            typer.secho(f"[ Resuming chat session: {chat} ]", fg="cyan", err=True)
+        else:
+            raise BadArgumentUsage("No previous chat session found.")
+
     if resume:
         # Get the last used chat session
         chat_sessions = ChatHandler.chat_session.list()
         if chat_sessions:
             # Use the last modified chat session
             chat = chat_sessions[-1].name
-            typer.secho(f"Resuming chat session: {chat}", fg="cyan")
+            typer.secho(f"[ Resuming chat session: {chat} ]", fg="cyan", err=True)
         else:
             # If no chat session exists, create a default one
             chat = "default"
-            typer.secho("No previous chat session found. Starting new default session.", fg="cyan")
+            typer.secho("[ No previous chat session found. Starting new default session. ]", fg="cyan", err=True)
 
     if editor and stdin_passed:
         raise BadArgumentUsage("--editor option cannot be used with stdin input.")
@@ -253,13 +300,20 @@ def main(
     if chat or (not shell and not code and not describe_shell):
         # Use ChatHandler for persistent conversations
         explicit_chat = chat is not None  # Track if user explicitly specified --chat
+        is_auto_chat = chat == "auto"
+
         if not chat:
             chat = "default"
-        
+
+        # Handle --chat auto: use temporary ID first, then rename after completion
+        if is_auto_chat:
+            temp_chat_id = f"auto-{uuid.uuid4().hex[:8]}"
+            chat = temp_chat_id
+
         # Clear default chat unless --resume or explicit --chat was used
         if chat == "default" and not explicit_chat and not resume:
             ChatHandler.chat_session.invalidate(chat)
-        
+
         full_completion = ChatHandler(chat, role_class, md).handle(
             prompt=prompt,
             model=model,
@@ -269,6 +323,12 @@ def main(
             caching=cache,
             functions=function_schemas,
         )
+
+        # After completion, generate AI-based name for auto chat
+        if is_auto_chat:
+            generated_name = generate_chat_name(prompt, model)
+            final_name = ChatHandler.chat_session.rename(temp_chat_id, generated_name)
+            typer.secho(f"\n[ Chat session created: {final_name} ]", fg="cyan", err=True)
     else:
         # Use DefaultHandler for single-shot interactions
         full_completion = DefaultHandler(role_class, md).handle(

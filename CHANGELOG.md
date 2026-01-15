@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5.post3] - 2026-01-15
+
+### Added
+- 新增 `--chat auto` 功能，讓 AI 自動根據對話內容生成聊天名稱
+  - 對話完成後會呼叫 AI 生成一個簡短的描述性名稱（2-5 個英文單字）
+  - 名稱僅使用小寫字母、數字和連字號，最長 50 字元
+  - 如果名稱已存在，會自動添加數字後綴（如 `python-help-2`）
+  - 完成後顯示：`Chat session created: <名稱>`
+- 新增 `--chat last` 功能，快速恢復最後一次對話
+  - 與 `--resume` 功能相同，但使用 `--chat` 語法
+  - 提供更一致的 `--chat` 選項體驗
+
+### Changed
+- 更新 `--chat` 選項說明，包含 `auto` 和 `last` 的特殊用法
+
 ## [1.4.5.post2] - 2026-01-15
 
 ### Fixed
