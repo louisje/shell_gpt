@@ -169,6 +169,19 @@ class ChatHandler(Handler):
         chat_history = cls.chat_session.get_messages(chat_id)
         return chat_history[0] if chat_history else ""
 
+    @staticmethod
+    def complete_chat_id(incomplete: str = "") -> List[str]:
+        """Autocompletion callback for chat IDs."""
+        # Get all chat session names using the class-level chat_session
+        chat_session = ChatSession(CHAT_CACHE_LENGTH, CHAT_CACHE_PATH)
+        chat_list = chat_session.list()
+        chat_names = [chat.name for chat in chat_list]
+        # Add special keywords
+        special = ["last", "temp", "auto"]
+        all_options = special + chat_names
+        # Filter by incomplete prefix
+        return [name for name in all_options if name.startswith(incomplete)]
+
     @classmethod
     @option_callback
     def list_ids(cls, value: str) -> None:

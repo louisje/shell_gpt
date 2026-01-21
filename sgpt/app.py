@@ -157,6 +157,7 @@ def main(
         help='Follow conversation with id. Use "temp" for quick session, '
         '"auto" for AI-generated name, "last" to resume last session.',
         rich_help_panel="Chat Options",
+        autocompletion=ChatHandler.complete_chat_id,
     ),
     resume: bool = typer.Option(
         False,
@@ -169,11 +170,13 @@ def main(
         None,
         help="Start a REPL (Read–eval–print loop) session.",
         rich_help_panel="Chat Options",
+        autocompletion=ChatHandler.complete_chat_id,
     ),
     show_chat: str = typer.Option(
         None,
         help="Show all messages from provided chat id.",
         rich_help_panel="Chat Options",
+        autocompletion=ChatHandler.complete_chat_id,
     ),
     list_chats: bool = typer.Option(
         False,
