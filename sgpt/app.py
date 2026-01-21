@@ -240,7 +240,6 @@ def main(
             last_chat_id = ChatHandler.chat_session.get_last_chat_id()
             if last_chat_id:
                 show_chat = last_chat_id
-                typer.secho(f"[ Showing chat session: {show_chat} ]", fg="cyan", err=True)
             else:
                 raise BadArgumentUsage("No previous chat session found.")
         ChatHandler.show_messages(show_chat, md)
@@ -380,8 +379,17 @@ def main(
         break
 
 
+# Create Typer app with shell completion support
+app = typer.Typer(
+    add_completion=True,
+    rich_markup_mode="rich",
+    no_args_is_help=False,
+)
+app.command()(main)
+
+
 def entry_point() -> None:
-    typer.run(main)
+    app()
 
 
 if __name__ == "__main__":

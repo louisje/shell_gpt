@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, Generator, List, Optional
 
@@ -7,6 +8,7 @@ from click import BadArgumentUsage
 from rich.console import Console, Group
 from rich.markdown import Markdown
 from rich.panel import Panel
+from rich.table import Table
 from rich.text import Text
 
 from ..config import cfg
@@ -182,15 +184,22 @@ class ChatHandler(Handler):
             ))
             return
 
-        # Collect all chat names
-        chat_names = [Text(chat_path.name, style="green") for chat_path in chat_list]
+        table = Table.grid(expand=True)
+        table.add_column(justify="left")
+        table.add_column(justify="right", style="dim")
+
+        for chat_path in chat_list:
+            modified_at = datetime.fromtimestamp(chat_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M")
+            table.add_row(Text(chat_path.name, style="green"), Text(modified_at, style="dim"))
 
         # Display chat list in a panel
-        console.print(Panel(
-            Group(*chat_names),
-            title=f"[cyan]Available Chat Sessions ({len(chat_list)})[/cyan]",
-            border_style="cyan"
-        ))
+        console.print(
+            Panel(
+                table,
+                title=f"[cyan]Available Chat Sessions ({len(chat_list)})[/cyan]",
+                border_style="cyan",
+            )
+        )
 
     @classmethod
     def show_messages(cls, chat_id: str, markdown: bool) -> None:
@@ -214,13 +223,21 @@ class ChatHandler(Handler):
             for message in messages:
                 if message.startswith("assistant:"):
                     renderables.append(Markdown(message, code_theme=theme))
+                elif message.startswith("user:"):
+                    renderables.append(Text(message, style="cyan"))
+                elif message.startswith("system:"):
+                    renderables.append(Text(message, style="green"))
                 else:
                     renderables.append(Text(message, style=color))
                 renderables.append(Text(""))  # Add empty line between messages
         else:
-            for index, message in enumerate(messages):
-                running_color = color if index % 2 == 0 else "green"
-                renderables.append(Text(message, style=running_color))
+            for message in messages:
+                if message.startswith("user:"):
+                    renderables.append(Text(message, style="cyan"))
+                elif message.startswith("system:"):
+                    renderables.append(Text(message, style="green"))
+                else:
+                    renderables.append(Text(message, style=color))
 
         # Display messages in a panel
         console.print(Panel(
