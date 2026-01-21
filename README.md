@@ -299,20 +299,45 @@ sgpt --chat conversation_3 "Convert the resulting file into an MP3"
 # -> ffmpeg -i output.mp4 -vn -acodec libmp3lame -ac 2 -ab 160k -ar 48000 final_output.mp3
 ```
 
-To list all the sessions from either conversational mode, use the `--list-chats` or `-lc` option:  
+To list all the sessions from either conversational mode, use the `--list-chats` or `-lc` option:
 ```shell
 sgpt --list-chats
-# .../shell_gpt/chat_cache/conversation_1  
-# .../shell_gpt/chat_cache/conversation_2
+# ╭─────────────────────────────────────────────────────╮
+# │ conversation_1          2026-01-21 14:30:25        │
+# │ conversation_2          2026-01-21 13:15:42        │
+# │ python_json_reading     2026-01-20 09:00:00        │
+# ╰─────────────────────────────────────────────────────╯
 ```
 
-To show all the messages related to a specific conversation, use the `--show-chat` option followed by the session name:
+To show all the messages related to a specific conversation, use the `--show-chat` option followed by the session name. You can also use `--show-chat last` to view the most recently used session:
 ```shell
 sgpt --show-chat conversation_1
-# user: please remember my favorite number: 4
-# assistant: I will remember that your favorite number is 4.
-# user: what would be my favorite number + 4?
-# assistant: Your favorite number is 4, so if we add 4 to it, the result would be 8.
+# ╭────────────────────── [ Conversation 1 ] ──────────────────────╮
+# │ user: please remember my favorite number: 4                    │
+# │ assistant: I will remember that your favorite number is 4.     │
+# │ user: what would be my favorite number + 4?                    │
+# │ assistant: Your favorite number is 4, so if we add 4...        │
+# ╰────────────────────────────────────────────────────────────────╯
+
+# View the most recently used chat session
+sgpt --show-chat last
+```
+
+#### Shell Completion (New in v1.4.5.post4)
+ShellGPT supports Tab completion for chat session names. To install the completion script:
+```shell
+sgpt --install-completion
+# bash completion installed in ~/.bash_completion.d/sgpt-completion.sh
+# Completion will take effect once you restart the terminal.
+```
+
+After installation, you can use Tab to autocomplete chat session names:
+```shell
+sgpt --chat [TAB]
+# last  temp  auto  conversation_1  conversation_2  python_json_reading
+
+sgpt --show-chat conv[TAB]
+# conversation_1  conversation_2
 ```
 
 ### REPL Mode  
@@ -529,9 +554,14 @@ Possible options for `CODE_THEME`: https://pygments.org/styles/
 │ --chat                 TEXT  Follow conversation with id. Use "temp" for quick session, "auto" for       │
 │                              AI-generated name, "last" to resume last session. [default: None]           │
 │ --repl                 TEXT  Start a REPL (Read–eval–print loop) session. [default: None]                │
-│ --show-chat            TEXT  Show all messages from provided chat id. [default: None]                    │
-│ --list-chats  -lc            List all existing chat ids.                                                 │
+│ --show-chat            TEXT  Show all messages from provided chat id. Use "last" to show most recent.    │
+│ --list-chats  -lc            List all existing chat ids with timestamps.                                 │
 │ --resume      -r             Resume last used chat session.                                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Setup Options ──────────────────────────────────────────────────────────────────────────────────────────╮
+│ --install-completion          Install shell completion for the current shell.                            │
+│ --install-integration         Install shell integration (Ctrl-S shortcut).                               │
+│ --install-functions           Install default function calling scripts.                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Role Options ───────────────────────────────────────────────────────────────────────────────────────────╮
 │ --role                  TEXT  System role for GPT model. [default: None]                                 │

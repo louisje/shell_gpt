@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5.post4] - 2026-01-21
+
+### Added
+- 新增 `--show-chat last` 功能，顯示最近使用的 chat session 內容
+- 新增 Chat ID 自動補全功能
+  - `--chat`, `--repl`, `--show-chat` 選項支援 Tab 補全
+  - 補全選項包含 `last`, `temp`, `auto` 特殊關鍵字及所有現有 chat session
+- 新增 `--install-completion` 安裝 shell 補全腳本
+  - Bash: 安裝到 `~/.bash_completion.d/sgpt-completion.sh`
+  - Zsh: 安裝到 `~/.zfunc/_sgpt`
+  - Fish: 安裝到 `~/.config/fish/completions/sgpt.fish`
+- 新增 `--install-integration` 安裝 shell 整合腳本到 `~/.bash_profile.d/sgpt.sh`
+
+### Changed
+- 美化 `--show-chat` 輸出，使用 Rich Panel 邊框樣式
+  - 標題格式改為 `[ Title Case ]`（底線轉空格，首字母大寫）
+  - 用戶訊息顯示為 cyan 色
+  - 系統訊息顯示為 green 色
+- 美化 `--list-chats` 輸出
+  - 使用 Rich Panel 邊框樣式
+  - 顯示每個 chat session 的最後修改時間戳
+
+### Fixed
+- 修復自動補全機制（在 `add_completion=False` 時正確處理補全請求）
+- 修復因代碼行為變更導致的測試失敗
+  - 新增 `CompletionMock` 類別解決 mock 引用問題
+  - 更新 `comp_args()` 從配置讀取 temperature 和 max_tokens
+- 隔離測試環境，避免載入用戶自定義函數
+
 ## [1.4.5.post3] - 2026-01-15
 
 ### Added
