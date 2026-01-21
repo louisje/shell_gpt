@@ -221,9 +221,10 @@ class ChatHandler(Handler):
         messages = cls.chat_session.get_messages(chat_id)
 
         if not messages:
+            display_name = chat_id.replace("_", " ").title()
             console.print(Panel(
                 "[yellow]No messages in this chat session.[/yellow]",
-                title=f"[cyan]Chat: {chat_id}[/cyan]",
+                title=f"[cyan][ {display_name} ][/cyan]",
                 border_style="cyan"
             ))
             return
@@ -253,9 +254,10 @@ class ChatHandler(Handler):
                     renderables.append(Text(message, style=color))
 
         # Display messages in a panel
+        display_name = chat_id.replace("_", " ").title()
         console.print(Panel(
             Group(*renderables),
-            title=f"[cyan]Chat: {chat_id}[/cyan]",
+            title=f"[cyan][ {display_name} ][/cyan]",
             border_style="cyan"
         ))
 
