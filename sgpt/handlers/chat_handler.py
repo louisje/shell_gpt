@@ -4,8 +4,10 @@ from typing import Any, Callable, Dict, Generator, List, Optional
 
 import typer
 from click import BadArgumentUsage
-from rich.console import Console
+from rich.console import Console, Group
 from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.text import Text
 
 from ..config import cfg
 from ..role import DefaultRoles, SystemRole
@@ -169,25 +171,63 @@ class ChatHandler(Handler):
     @option_callback
     def list_ids(cls, value: str) -> None:
         # Prints all existing chat IDs (names only) to the console.
-        for chat_path in cls.chat_session.list():
-            typer.echo(chat_path.name)
+        console = Console()
+        chat_list = list(cls.chat_session.list())
+
+        if not chat_list:
+            console.print(Panel(
+                "[yellow]No chat sessions found.[/yellow]",
+                title="[cyan]Available Chat Sessions[/cyan]",
+                border_style="cyan"
+            ))
+            return
+
+        # Collect all chat names
+        chat_names = [Text(chat_path.name, style="green") for chat_path in chat_list]
+
+        # Display chat list in a panel
+        console.print(Panel(
+            Group(*chat_names),
+            title=f"[cyan]Available Chat Sessions ({len(chat_list)})[/cyan]",
+            border_style="cyan"
+        ))
 
     @classmethod
     def show_messages(cls, chat_id: str, markdown: bool) -> None:
+        console = Console()
         color = cfg.get("DEFAULT_COLOR")
-        if "APPLY MARKDOWN" in cls.initial_message(chat_id) and markdown:
-            theme = cfg.get("CODE_THEME")
-            for message in cls.chat_session.get_messages(chat_id):
-                if message.startswith("assistant:"):
-                    Console().print(Markdown(message, code_theme=theme))
-                else:
-                    typer.secho(message, fg=color)
-                typer.echo()
+        messages = cls.chat_session.get_messages(chat_id)
+
+        if not messages:
+            console.print(Panel(
+                "[yellow]No messages in this chat session.[/yellow]",
+                title=f"[cyan]Chat: {chat_id}[/cyan]",
+                border_style="cyan"
+            ))
             return
 
-        for index, message in enumerate(cls.chat_session.get_messages(chat_id)):
-            running_color = color if index % 2 == 0 else "green"
-            typer.secho(message, fg=running_color)
+        # Collect all message renderables
+        renderables = []
+
+        if "APPLY MARKDOWN" in cls.initial_message(chat_id) and markdown:
+            theme = cfg.get("CODE_THEME")
+            for message in messages:
+                if message.startswith("assistant:"):
+                    renderables.append(Markdown(message, code_theme=theme))
+                else:
+                    renderables.append(Text(message, style=color))
+                renderables.append(Text(""))  # Add empty line between messages
+        else:
+            for index, message in enumerate(messages):
+                running_color = color if index % 2 == 0 else "green"
+                renderables.append(Text(message, style=running_color))
+
+        # Display messages in a panel
+        console.print(Panel(
+            Group(*renderables),
+            title=f"[cyan]Chat: {chat_id}[/cyan]",
+            border_style="cyan"
+        ))
 
     def validate(self) -> None:
         if self.initiated:

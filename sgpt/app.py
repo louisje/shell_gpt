@@ -235,7 +235,16 @@ def main(
             pass
 
     if show_chat:
+        # Handle --show-chat last
+        if show_chat == "last":
+            last_chat_id = ChatHandler.chat_session.get_last_chat_id()
+            if last_chat_id:
+                show_chat = last_chat_id
+                typer.secho(f"[ Showing chat session: {show_chat} ]", fg="cyan", err=True)
+            else:
+                raise BadArgumentUsage("No previous chat session found.")
         ChatHandler.show_messages(show_chat, md)
+        return
 
     if sum((shell, describe_shell, code)) > 1:
         raise BadArgumentUsage(
