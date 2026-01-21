@@ -21,8 +21,10 @@ from sgpt.role import DefaultRoles, SystemRole
 from sgpt.utils import (
     get_edited_prompt,
     get_sgpt_version,
+    install_completion,
     install_shell_integration,
     run_command,
+    show_completion,
 )
 
 
@@ -137,6 +139,18 @@ def main(
         "--version",
         help="Show version.",
         callback=get_sgpt_version,
+    ),
+    _install_completion: bool = typer.Option(
+        False,
+        "--install-completion",
+        help="Install completion for the current shell.",
+        callback=install_completion,
+    ),
+    _show_completion: str = typer.Option(
+        None,
+        "--show-completion",
+        help="Show completion for specified shell (bash/zsh/fish).",
+        callback=show_completion,
     ),
     chat: str = typer.Option(
         None,
@@ -379,9 +393,9 @@ def main(
         break
 
 
-# Create Typer app with shell completion support
+# Create Typer app (disable built-in completion, use custom implementation)
 app = typer.Typer(
-    add_completion=True,
+    add_completion=False,
     rich_markup_mode="rich",
     no_args_is_help=False,
 )
