@@ -10,7 +10,7 @@ from sgpt import main
 from sgpt.config import cfg
 
 runner = CliRunner()
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
 app.command()(main)
 
 

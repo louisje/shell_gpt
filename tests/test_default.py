@@ -248,3 +248,106 @@ def test_no_markdown(completion, markdown_printer, text_printer):
     assert result.exit_code == 0
     markdown_printer.assert_not_called()
     text_printer.assert_called()
+
+
+@patch("sgpt.handlers.handler.completion")
+def test_show_chat_last(completion):
+    """Test --show-chat last shows the most recent chat session."""
+    completion.return_value = mock_comp("test response")
+    chat_name = "_test_last"
+    chat_path = Path(cfg.get("CHAT_CACHE_PATH")) / chat_name
+    chat_path.unlink(missing_ok=True)
+
+    # Create a chat session first
+    args = {"prompt": "hello", "--chat": chat_name}
+    result = runner.invoke(app, cmd_args(**args))
+    assert result.exit_code == 0
+    assert chat_path.exists()
+
+    # Use --show-chat last to display it
+    result = runner.invoke(app, ["--show-chat", "last"])
+    assert result.exit_code == 0
+    assert "hello" in result.output
+    chat_path.unlink()
+
+
+@patch("sgpt.handlers.handler.completion")
+def test_show_chat_title_format(completion):
+    """Test --show-chat displays title in [ Title Case ] format."""
+    completion.return_value = mock_comp("response")
+    chat_name = "_test_title_format"
+    chat_path = Path(cfg.get("CHAT_CACHE_PATH")) / chat_name
+    chat_path.unlink(missing_ok=True)
+
+    # Create a chat session
+    args = {"prompt": "hello", "--chat": chat_name}
+    result = runner.invoke(app, cmd_args(**args))
+    assert result.exit_code == 0
+
+    # Show chat and verify title format (underscores to spaces, title case)
+    result = runner.invoke(app, ["--show-chat", chat_name])
+    assert result.exit_code == 0
+    # Title should be "[ Test Title Format ]" (title case, spaces)
+    assert "Test Title Format" in result.output
+    chat_path.unlink()
+
+
+@patch("sgpt.handlers.handler.completion")
+def test_list_chats_panel_format(completion):
+    """Test --list-chats displays chats in a panel with timestamps."""
+    completion.return_value = mock_comp("ok")
+    chat_name = "_test_list"
+    chat_path = Path(cfg.get("CHAT_CACHE_PATH")) / chat_name
+    chat_path.unlink(missing_ok=True)
+
+    # Create a chat session
+    args = {"prompt": "hello", "--chat": chat_name}
+    result = runner.invoke(app, cmd_args(**args))
+    assert result.exit_code == 0
+
+    # List chats and verify format
+    result = runner.invoke(app, ["--list-chats"])
+    assert result.exit_code == 0
+    assert "_test_list" in result.output
+    # Verify timestamp format (YYYY-MM-DD HH:MM)
+    import re
+    assert re.search(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}", result.output)
+    chat_path.unlink()
+
+
+def test_complete_chat_id():
+    """Test chat ID autocompletion returns special keywords and chat names."""
+    from sgpt.handlers.chat_handler import ChatHandler
+
+    # Test that special keywords are always included
+    result = ChatHandler.complete_chat_id("")
+    assert "last" in result
+    assert "temp" in result
+    assert "auto" in result
+
+    # Test filtering by prefix
+    result = ChatHandler.complete_chat_id("la")
+    assert "last" in result
+    assert "temp" not in result
+    assert "auto" not in result
+
+
+@patch("sgpt.handlers.handler.completion")
+def test_show_chat_message_colors(completion):
+    """Test --show-chat displays messages with correct colors."""
+    completion.return_value = mock_comp("assistant response")
+    chat_name = "_test_colors"
+    chat_path = Path(cfg.get("CHAT_CACHE_PATH")) / chat_name
+    chat_path.unlink(missing_ok=True)
+
+    # Create a chat session
+    args = {"prompt": "user message", "--chat": chat_name}
+    result = runner.invoke(app, cmd_args(**args))
+    assert result.exit_code == 0
+
+    # Show chat - messages should be displayed
+    result = runner.invoke(app, ["--show-chat", chat_name])
+    assert result.exit_code == 0
+    assert "user:" in result.output or "user message" in result.output
+    assert "assistant:" in result.output or "assistant response" in result.output
+    chat_path.unlink()
