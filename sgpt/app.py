@@ -7,6 +7,7 @@ import readline  # noqa: F401
 import sys
 
 import typer
+import typer.completion
 from click import BadArgumentUsage
 from click.types import Choice
 from prompt_toolkit import PromptSession
@@ -406,6 +407,8 @@ app.command()(main)
 
 
 def entry_point() -> None:
+    # Initialize completion handling (required when add_completion=False)
+    typer.completion.completion_init()
     app()
 
 
