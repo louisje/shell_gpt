@@ -162,13 +162,10 @@ def test_default_repl_stdin():
         chat_path = Path(cfg.get("CHAT_CACHE_PATH")) / chat_name
         chat_path.unlink(missing_ok=True)
 
-        my_runner = CliRunner()
-        my_app = typer.Typer()
-        my_app.command()(main)
-
+        # Use the shared app instead of creating a new one to avoid duplicate parameter warnings
         args = {"--repl": chat_name}
         inputs = ["this is stdin", "__sgpt__eof__", "prompt", "another", "exit()"]
-        result = my_runner.invoke(my_app, cmd_args(**args), input="\n".join(inputs))
+        result = runner.invoke(app, cmd_args(**args), input="\n".join(inputs))
 
         expected_messages = [
             {"role": "system", "content": role.role},
