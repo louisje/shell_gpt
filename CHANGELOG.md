@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0.post1] - 2026-01-28
+
+### Changed
+- 合併上游 1.5.0 版本
+  - 遷移至 OpenAI v2 SDK（`openai >= 2.0.0`）
+  - 改進 tool_call 處理，新增 LiteLLM 相容性
+  - 確保第一條聊天訊息被保留，避免 "Could not determine chat role" 錯誤
+  - 在回應 chunks 中檢查空 choices
+  - LLM 函數優化
+
+### Fixed
+- 修正 OpenAI v2 API 相容性問題（assistant message content 改為 `None`）
+
 ## [1.4.5.post4] - 2026-01-21
 
 ### Added
