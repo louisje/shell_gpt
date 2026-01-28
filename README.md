@@ -1,13 +1,13 @@
 # ShellGPT
 A command-line productivity tool powered by AI large language models (LLM). This command-line tool offers streamlined generation of **shell commands, code snippets, documentation**, eliminating the need for external resources (like Google search). Supports Linux, macOS, Windows and compatible with all major Shells like PowerShell, CMD, Bash, Zsh, etc.
 
-https://github.com/TheR1D/shell_gpt/assets/16740832/9197283c-db6a-4b46-bfea-3eb776dd9093
+https://github.com/TheR1D/shell_gpt/assets/16740832/721ddb19-97e7-428f-a0ee-107d027ddd59
 
 ## Installation
 ```shell
 pip install shell-gpt
 ```
-By default, ShellGPT uses OpenAI's API and GPT-4 model. You'll need an API key, you can generate one [here](https://beta.openai.com/account/api-keys). You will be prompted for your key which will then be stored in `~/.config/shell_gpt/.sgptrc`. OpenAI API is not free of charge, please refer to the [OpenAI pricing](https://openai.com/pricing) for more information.
+By default, ShellGPT uses OpenAI's API and GPT-4 model. You'll need an API key, you can generate one [here](https://platform.openai.com/api-keys). You will be prompted for your key which will then be stored in `~/.config/shell_gpt/.sgptrc`. OpenAI API is not free of charge, please refer to the [OpenAI pricing](https://openai.com/pricing) for more information.
 
 ### Development Installation
 For developers who want to contribute or modify ShellGPT:
@@ -402,28 +402,7 @@ The snippet of code you've provided is written in Python. It prompts the user...
 sgpt --install-functions
 ```
 
-ShellGPT has a convenient way to define functions and use them. In order to create your custom function, navigate to `~/.config/shell_gpt/functions` and create a new .py file with the function name. Inside this file, you can define your function using the following syntax:
-```python
-# execute_shell_command.py
-import subprocess
-from pydantic import Field
-from instructor import OpenAISchema
-
-
-class Function(OpenAISchema):
-    """
-    Executes a shell command and returns the output (result).
-    """
-    shell_command: str = Field(..., example="ls -la", descriptions="Shell command to execute.")
-
-    class Config:
-        title = "execute_shell_command"
-
-    @classmethod
-    def execute(cls, shell_command: str) -> str:
-        result = subprocess.run(shell_command.split(), capture_output=True, text=True)
-        return f"Exit code: {result.returncode}, Output:\n{result.stdout}"
-```
+ShellGPT has a convenient way to define functions and use them. In order to create your custom function, navigate to `~/.config/shell_gpt/functions` and create a new .py file with the function name. Inside this file, you can define your function using this [example](https://github.com/TheR1D/shell_gpt/blob/main/sgpt/llm_functions/common/execute_shell.py).
 
 The docstring comment inside the class will be passed to OpenAI API as a description for the function, along with the `title` attribute and parameters descriptions. The `execute` function will be called if LLM decides to use your function. In this case we are allowing LLM to execute any Shell commands in our system. Since we are returning the output of the command, LLM will be able to analyze it and decide if it is a good fit for the prompt. Here is an example how the function might be executed by LLM:
 ```shell
