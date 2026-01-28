@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.0.post1] - 2026-01-28
 
+### ⚠️ Breaking Changes
+- 函數文件格式已更新，不再使用 `instructor.OpenAISchema`
+- **升級步驟**：如果 `sgpt` 出錯，請執行以下命令更新函數文件：
+  ```bash
+  rm ~/.config/shell_gpt/functions/*.py
+  sgpt --install-functions
+  ```
+
 ### Changed
 - 合併上游 1.5.0 版本
   - 遷移至 OpenAI v2 SDK（`openai >= 2.0.0`）
