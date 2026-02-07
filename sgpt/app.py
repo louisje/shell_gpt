@@ -81,6 +81,8 @@ def main(
     ),
     temperature: float = typer.Option(
         cfg.get("TEMPERATURE"),
+        "--temperature",
+        "-t",
         min=0.0,
         max=2.0,
         help="Randomness of generated output.",
@@ -402,6 +404,7 @@ app = typer.Typer(
     add_completion=False,
     rich_markup_mode="rich",
     no_args_is_help=False,
+    context_settings={"help_option_names": ["--help", "-h"]},
 )
 app.command()(main)
 
