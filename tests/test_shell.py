@@ -1,8 +1,14 @@
 import os
+import shutil
+import subprocess
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 
+import pytest
+
 from sgpt.config import cfg
+from sgpt.integration import bash_integration, zsh_integration
 from sgpt.role import DefaultRoles, SystemRole
 
 from .utils import CompletionMock, app, cmd_args, comp_args, mock_comp, runner
@@ -179,3 +185,42 @@ def test_shell_no_interaction():
         assert result.exit_code == 0
         assert "git commit" in result.output
         assert "[E]xecute" not in result.output
+
+
+def test_bash_integration_can_be_sourced_with_errexit():
+    with NamedTemporaryFile("w", suffix=".sh", delete=False) as file:
+        file.write(bash_integration.strip() + "\n")
+        script_path = file.name
+
+    try:
+        result = subprocess.run(
+            ["bash", "-ec", 'source "$1"; echo ok', "bash", script_path],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    finally:
+        os.unlink(script_path)
+
+    assert result.returncode == 0
+    assert result.stdout.strip() == "ok"
+
+
+@pytest.mark.skipif(shutil.which("zsh") is None, reason="zsh not installed")
+def test_zsh_integration_can_be_sourced_with_errexit():
+    with NamedTemporaryFile("w", suffix=".zsh", delete=False) as file:
+        file.write(zsh_integration.strip() + "\n")
+        script_path = file.name
+
+    try:
+        result = subprocess.run(
+            ["zsh", "-ec", 'source "$1"; echo ok', "zsh", script_path],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    finally:
+        os.unlink(script_path)
+
+    assert result.returncode == 0
+    assert result.stdout.strip() == "ok"

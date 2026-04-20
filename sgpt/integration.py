@@ -13,7 +13,7 @@ bash_integration = """
 # Installed by: sgpt --install-integration
 # Documentation: https://github.com/TheR1D/shell_gpt
 
-[[ $- == *i* ]] && [[ -t 0 ]] && {
+if [[ $- == *i* ]] && [[ -t 0 ]]; then
     stty -ixon  # Disable flow control to allow Ctrl-S
     _sgpt_bash() {
         if [[ -n "$READLINE_LINE" ]]; then
@@ -22,7 +22,7 @@ bash_integration = """
         fi
     }
     bind -x '"\\C-s": _sgpt_bash'
-}
+fi
 """
 
 zsh_integration = """
@@ -41,7 +41,7 @@ zsh_integration = """
 # Installed by: sgpt --install-integration
 # Documentation: https://github.com/TheR1D/shell_gpt
 
-[[ $- == *i* ]] && [[ -t 0 ]] && {
+if [[ $- == *i* ]] && [[ -t 0 ]]; then
     stty -ixon  # Disable flow control to allow Ctrl-S
     _sgpt_zsh() {
         if [[ -n "$BUFFER" ]]; then
@@ -54,5 +54,5 @@ zsh_integration = """
     }
     zle -N _sgpt_zsh
     bindkey ^s _sgpt_zsh
-}
+fi
 """
