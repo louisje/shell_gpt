@@ -21,10 +21,10 @@ DEFAULT_CONFIG = {
     "CACHE_PATH": os.getenv("CACHE_PATH", str(CACHE_PATH)),
     "CHAT_CACHE_LENGTH": int(os.getenv("CHAT_CACHE_LENGTH", "100")),
     "CACHE_LENGTH": int(os.getenv("CHAT_CACHE_LENGTH", "100")),
-    "TEMPERATURE": os.getenv("TEMPERATURE", "0.25"),
     "MAX_TOKENS": int(os.getenv("MAX_TOKENS", "16384")),
     "REQUEST_TIMEOUT": int(os.getenv("REQUEST_TIMEOUT", "60")),
     "DEFAULT_MODEL": os.getenv("DEFAULT_MODEL", "llama3.3-ffm-70b-32k-chat"),
+    "DEFAULT_TEMPERATURE": os.getenv("TEMPERATURE", "0.25"),
     "DEFAULT_COLOR": os.getenv("DEFAULT_COLOR", "magenta"),
     "ROLE_STORAGE_PATH": os.getenv("ROLE_STORAGE_PATH", str(ROLE_STORAGE_PATH)),
     "DEFAULT_EXECUTE_SHELL_CMD": os.getenv("DEFAULT_EXECUTE_SHELL_CMD", "false"),
@@ -37,6 +37,10 @@ DEFAULT_CONFIG = {
     "PRETTIFY_MARKDOWN": os.getenv("PRETTIFY_MARKDOWN", "true"),
     "USE_LITELLM": os.getenv("USE_LITELLM", "false"),
     "SHELL_INTERACTION": os.getenv("SHELL_INTERACTION ", "true"),
+    "MARKDOWN_LIVE_VERTICAL_OVERFLOW": os.getenv(
+        "MARKDOWN_LIVE_VERTICAL_OVERFLOW", "visible"
+    ),
+    "MARKDOWN_LIVE_REFRESH_INTERVAL": os.getenv("MARKDOWN_LIVE_REFRESH_INTERVAL", "0"),
     "OS_NAME": os.getenv("OS_NAME", "auto"),
     "SHELL_NAME": os.getenv("SHELL_NAME", "auto"),
     # New features might add their own config variables here.

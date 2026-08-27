@@ -8,7 +8,7 @@ from sgpt import config, main
 from sgpt.__version__ import __version__
 from sgpt.role import DefaultRoles, SystemRole
 
-from .utils import CompletionMock, app, cmd_args, comp_args, mock_comp, runner
+from .utils import CompletionMock, app, assert_usage_error, cmd_args, comp_args, mock_comp, runner
 
 role = SystemRole.get(DefaultRoles.DEFAULT.value)
 cfg = config.cfg
@@ -83,11 +83,19 @@ def test_default_chat():
         chat_path = Path(cfg.get("CHAT_CACHE_PATH")) / chat_name
         chat_path.unlink(missing_ok=True)
 
+<<<<<<< HEAD
         args = {"prompt": "my number is 2", "--chat": chat_name}
         result = runner.invoke(app, cmd_args(**args))
         assert result.exit_code == 0
         assert "ok" in result.output
         assert chat_path.exists()
+=======
+    args: dict[str, str | bool] = {"prompt": "my number is 2", "--chat": chat_name}
+    result = runner.invoke(app, cmd_args(**args))
+    assert result.exit_code == 0
+    assert "ok" in result.output
+    assert chat_path.exists()
+>>>>>>> TheR1D/main
 
         args["prompt"] = "my number + 2?"
         result = runner.invoke(app, cmd_args(**args))
@@ -115,6 +123,7 @@ def test_default_chat():
         assert "my number + 2?" in result.output
         assert "4" in result.output
 
+<<<<<<< HEAD
         args["--shell"] = True
         result = runner.invoke(app, cmd_args(**args))
         assert result.exit_code == 2
@@ -125,6 +134,16 @@ def test_default_chat():
         assert result.exit_code == 2
         assert "Error" in result.output
         chat_path.unlink()
+=======
+    args["--shell"] = True
+    result = runner.invoke(app, cmd_args(**args))
+    assert_usage_error(result)
+
+    args["--code"] = True
+    result = runner.invoke(app, cmd_args(**args))
+    assert_usage_error(result)
+    chat_path.unlink()
+>>>>>>> TheR1D/main
 
 
 def test_default_repl():

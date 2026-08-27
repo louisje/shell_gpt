@@ -80,7 +80,7 @@ def main(
         help="Max tokens of generated output.",
     ),
     temperature: float = typer.Option(
-        cfg.get("TEMPERATURE"),
+        cfg.get("DEFAULT_TEMPERATURE"),
         "--temperature",
         "-t",
         min=0.0,
@@ -170,7 +170,7 @@ def main(
     ),
     repl: str = typer.Option(
         None,
-        help="Start a REPL (Read–eval–print loop) session.",
+        help="Start a REPL (Read-eval-print loop) session.",
         rich_help_panel="Chat Options",
         autocompletion=ChatHandler.complete_chat_id,
     ),

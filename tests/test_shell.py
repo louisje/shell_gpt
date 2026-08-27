@@ -11,7 +11,7 @@ from sgpt.config import cfg
 from sgpt.integration import bash_integration, zsh_integration
 from sgpt.role import DefaultRoles, SystemRole
 
-from .utils import CompletionMock, app, cmd_args, comp_args, mock_comp, runner
+from .utils import CompletionMock, app, assert_usage_error, cmd_args, comp_args, mock_comp, runner
 
 
 def test_shell():
@@ -120,12 +120,20 @@ def test_shell_chat():
         completion.assert_called_with_captured(**expected_args)
         assert completion.call_count == 2
 
+<<<<<<< HEAD
         args["--code"] = True
         result = runner.invoke(app, cmd_args(**args))
         assert result.exit_code == 2
         assert "Error" in result.output
         chat_path.unlink()
         # TODO: Shell chat can be recalled without --shell option.
+=======
+    args["--code"] = True
+    result = runner.invoke(app, cmd_args(**args))
+    assert_usage_error(result)
+    chat_path.unlink()
+    # TODO: Shell chat can be recalled without --shell option.
+>>>>>>> TheR1D/main
 
 
 @patch("os.system")
@@ -166,8 +174,7 @@ def test_shell_and_describe_shell(completion):
     result = runner.invoke(app, cmd_args(**args))
 
     completion.assert_not_called()
-    assert result.exit_code == 2
-    assert "Error" in result.output
+    assert_usage_error(result)
 
 
 def test_shell_no_interaction():

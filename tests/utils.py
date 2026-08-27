@@ -1,8 +1,13 @@
 import copy
 from datetime import datetime
+<<<<<<< HEAD
 from unittest.mock import MagicMock
+=======
+from typing import Any
+>>>>>>> TheR1D/main
 
 import typer
+from click import UsageError
 from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
 from openai.types.chat.chat_completion_chunk import Choice as StreamChoice
 from openai.types.chat.chat_completion_chunk import ChoiceDelta
@@ -50,6 +55,12 @@ class CompletionMock(MagicMock):
             f"Expected: {expected_kwargs}\nActual: {actual_kwargs}"
         )
 
+def assert_usage_error(result, message=None):
+    assert result.exit_code == 1, result
+    assert isinstance(result.exception, UsageError), result.exception
+    if message is not None:
+        assert message in str(result.exception), result.exception
+
 
 def mock_comp(tokens_string):
     return [
@@ -70,7 +81,8 @@ def mock_comp(tokens_string):
     ]
 
 
-def cmd_args(prompt="", **kwargs):
+def cmd_args(**kwargs: Any) -> list[str]:
+    prompt = kwargs.pop("prompt", "")
     arguments = [prompt]
     for key, value in kwargs.items():
         arguments.append(key)

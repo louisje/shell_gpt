@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
-from typing import Any, Callable, Dict, Generator, List, Optional
+from typing import Any, Callable, Dict, Generator, List, Optional, cast
+
+from rich.live_render import VerticalOverflowMethod
 
 from ..cache import Cache
 from ..config import cfg
@@ -23,7 +25,6 @@ if use_litellm:
 
     completion = litellm.completion
     litellm.suppress_debug_info = True
-    additional_kwargs.pop("api_key")
 else:
     from openai import OpenAI
 
@@ -47,8 +48,12 @@ class Handler:
 
     @property
     def printer(self) -> Printer:
+        vertical_overflow = cast(
+            VerticalOverflowMethod, cfg.get("MARKDOWN_LIVE_VERTICAL_OVERFLOW")
+        )
+        refresh_interval = float(cfg.get("MARKDOWN_LIVE_REFRESH_INTERVAL"))
         return (
-            MarkdownPrinter(self.code_theme)
+            MarkdownPrinter(self.code_theme, refresh_interval, vertical_overflow)
             if self.markdown
             else TextPrinter(self.color)
         )
