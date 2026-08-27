@@ -176,6 +176,8 @@ def main(
     ),
     show_chat: str = typer.Option(
         None,
+        "--show-chat",
+        "-sc",
         help="Show all messages from provided chat id.",
         rich_help_panel="Chat Options",
         autocompletion=ChatHandler.complete_chat_id,
